@@ -1,9 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"io/fs"
 	"os"
 
@@ -12,8 +12,7 @@ import (
 )
 
 const (
-	configPath        = "config.json"
-	defaultConfigPath = "default.config.json"
+	configPath = "config.json"
 )
 
 func main() {
@@ -29,7 +28,7 @@ func run() error {
 			return err
 		}
 
-		if err := copyFileContents(configPath, defaultConfigPath); err != nil {
+		if err := firstRunSetup(); err != nil {
 			return err
 		}
 	}
@@ -48,20 +47,48 @@ func run() error {
 	return nil
 }
 
-func copyFileContents(dstPath, srcPath string) error {
-	srcFile, err := os.Open(srcPath)
+func firstRunSetup() error {
+	config := config.Default()
+
+	for config.BotUsername == "" {
+		fmt.Fprintf(os.Stdout, "Enter the bot's Twitch username: ")
+		if _, err := fmt.Fscanln(os.Stdin, &config.BotUsername); err != nil {
+			continue
+		}
+	}
+
+	fmt.Fprintf(os.Stdout, "\nTo generate an OAuth Token, go to this link while logged into your bot account: https://twitchapps.com/tmi/\n\n")
+
+	for config.BotAuthToken == "" {
+		fmt.Fprintf(os.Stdout, "Enter the bot's OAuth Token, including the 'oauth:' part: ")
+		if _, err := fmt.Fscanln(os.Stdin, &config.BotAuthToken); err != nil {
+			continue
+		}
+	}
+
+	fmt.Fprintf(os.Stdout, "\n")
+
+	for config.ChannelName == "" {
+		fmt.Fprintf(os.Stdout, "Enter the Twitch channel the bot should join: ")
+		if _, err := fmt.Fscanln(os.Stdin, &config.ChannelName); err != nil {
+			continue
+		}
+	}
+
+	fmt.Fprintf(os.Stdout, "\nIf the details are correct, the bot should connect successfully. If not, check the 'config.json' file. If you're still having issues, check GitHub or reach out to me directly on Twitter (@DeadRobotDev), Twitch (DeadRobotDev), or Discord (Fletcher#9914).\n\n")
+
+	file, err := os.Create(configPath)
 	if err != nil {
 		return err
 	}
-	defer srcFile.Close()
+	defer file.Close()
 
-	dstFile, err := os.Create(dstPath)
+	data, err := json.MarshalIndent(config, "", "\t")
 	if err != nil {
-		return err
+		return nil
 	}
-	defer srcFile.Close()
 
-	if _, err := io.Copy(dstFile, srcFile); err != nil {
+	if _, err := file.Write(data); err != nil {
 		return err
 	}
 
