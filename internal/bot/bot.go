@@ -18,7 +18,7 @@ type Bot struct {
 	tasks    map[string]*Task
 }
 
-const tasksPath = "tasks.txt"
+const tasksPath = "viewer_tasks.txt"
 
 func New(config *config.Config) *Bot {
 	return &Bot{
