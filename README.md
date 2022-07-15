@@ -1,5 +1,5 @@
 # twitch-pomo-bot
-A Twitch chat bot for co-working streamers. Viewers can set their own task. Streamers can display them by adding a simple text source to OBS.
+A Twitch chat bot for co-working streams that allows viewers to set their own task. The tasks are saved to a text file so they can be displayed in OBS.
 
 ## Installation
 - Download the [latest release](https://github.com/DeadRobotDev/twitch-pomo-bot/releases).
