@@ -27,5 +27,5 @@ func newTask(user twitch.User, taskName string) *Task {
 }
 
 func (t *Task) String() string {
-	return fmt.Sprintf("%s: %s", t.User.DisplayName, t.Name)
+	return fmt.Sprintf("%s: %s\n", t.User.DisplayName, t.Name)
 }
